@@ -1,10 +1,11 @@
 package com.bitclave.node.repository.models
 
+import com.fasterxml.jackson.annotation.JsonIgnore
 import org.hibernate.annotations.ColumnDefault
 import javax.persistence.*
 
 @Entity
-data class File(
+data class UploadedFile(
         @GeneratedValue(strategy = GenerationType.TABLE) @Id
         val id: Long = 0,
 
@@ -19,7 +20,7 @@ data class File(
         @Column(nullable = false) @ColumnDefault("0")
         var size: Long = 0,
 
+        @JsonIgnore
         @Lob
-        @Column(columnDefinition="BLOB")
         var data: ByteArray? = null
 ) {}
