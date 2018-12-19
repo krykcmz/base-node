@@ -11,6 +11,7 @@ import io.swagger.annotations.ApiParam
 import io.swagger.annotations.ApiResponse
 import io.swagger.annotations.ApiResponses
 import org.springframework.beans.factory.annotation.Qualifier
+import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -132,12 +133,14 @@ class FileController(
 
             @ApiParam("change repository strategy", allowableValues = "POSTGRES", required = false)
             @RequestHeader("Strategy", required = false)
-            strategy: String?): CompletableFuture<ByteArray> {
+            strategy: String?): CompletableFuture<ResponseEntity<ByteArray>> {
 
         return fileService.getFile(id, publicKey,getStrategyType(strategy))
                 .thenCompose {
                     if (it == null || it.id != id || it.data == null) throw NotFoundException()
-                    CompletableFuture.completedFuture(it.data!!)
+                    CompletableFuture.completedFuture(ResponseEntity.ok()
+                            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + it.name + "\"")
+                            .body(it.data!!))
                 }
     }
 
