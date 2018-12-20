@@ -76,15 +76,4 @@ class FileService(private val fileRepository: RepositoryStrategy<FileRepository>
         })
     }
 
-    fun getUserFiles(
-            publicKey: String,
-            strategy: RepositoryStrategyType
-    ): CompletableFuture<List<UploadedFile>> {
-
-        return CompletableFuture.supplyAsync({
-            fileRepository.changeStrategy(strategy)
-                    .findByPublicKey(publicKey)
-        })
-    }
-
 }
