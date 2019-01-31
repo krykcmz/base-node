@@ -152,8 +152,8 @@ class OfferSearchServiceTest {
 
     @Test
     fun `should be create new offer search item and get result by clientId and search request id`() {
-        offerSearchService.saveOfferSearch(
-                OfferSearch(0, 1L, 1L, OfferResultAction.NONE),
+        offerSearchService.saveNewOfferSearch(
+                OfferSearch(0, 1L, 1L, OfferResultAction.NONE, "","", ArrayList()),
                 strategy
         ).get()
 
@@ -166,9 +166,25 @@ class OfferSearchServiceTest {
     }
 
     @Test
+    fun `should be add EVENT as serialized object into array`() {
+        var events = mutableListOf("tram taram")
+        offerSearchService.saveNewOfferSearch(
+                OfferSearch(0, 1L, 1L, OfferResultAction.NONE, "", "", events),
+                strategy
+        ).get()
+
+        offerSearchService.addEventTo( "bla bla bla",1L, strategy).get()
+
+
+        val result = offerSearchService.getOffersResult(strategy, 1L).get()
+        assert(result[0].offerSearch.events.contains("bla bla bla"))
+
+    }
+
+    @Test
     fun `should be create new offer search item and get result by clientId and offer search id`() {
-        offerSearchService.saveOfferSearch(
-                OfferSearch(0, 1L, 1L, OfferResultAction.NONE),
+        offerSearchService.saveNewOfferSearch(
+                OfferSearch(0, 1L, 1L, OfferResultAction.NONE, "", "", ArrayList()),
                 strategy
         ).get()
 
@@ -188,7 +204,7 @@ class OfferSearchServiceTest {
         val result = offerSearchService.getOffersResult(strategy, 1L).get()
         assert(result.size == 1)
         assert(result[0].offerSearch.id == 1L)
-        assert(result[0].offerSearch.state == OfferResultAction.REJECT)
+        assert(result[0].offerSearch.state == OfferResultAction.COMPLAIN)
         assert(result[0].offer.id == 1L)
         assert(result[0].offer.owner == businessPublicKey)
     }
