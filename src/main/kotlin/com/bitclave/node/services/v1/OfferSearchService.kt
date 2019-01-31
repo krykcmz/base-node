@@ -88,8 +88,29 @@ class OfferSearchService(
                     .findById(item.searchRequestId)
                     ?: AccessDeniedException()
 
-            item.state = OfferResultAction.REJECT;
-            repository.saveSearchResult(item)
+//            item.state = OfferResultAction.REJECT;
+//            repository.saveSearchResult(item)
+
+            val relatedOfferSearches = repository.findBySearchRequestIdAndOfferId(item.searchRequestId, item.offerId)
+
+            relatedOfferSearches.forEach{offerSearchObj -> offerSearchObj.state = OfferResultAction.REJECT}
+
+            repository.saveSearchResult(relatedOfferSearches)
+        }
+    }
+
+    fun getSearchOffers(
+            strategy: RepositoryStrategyType,
+            searchRequestId: Long,
+            offerId: Long
+    ): CompletableFuture<List<OfferSearch>> {
+
+        return CompletableFuture.supplyAsync {
+
+            val repository = offerSearchRepository.changeStrategy(strategy)
+
+            return@supplyAsync repository.findBySearchRequestIdAndOfferId(searchRequestId, offerId)
+
         }
     }
 

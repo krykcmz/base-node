@@ -159,7 +159,7 @@ class OfferSearchServiceTest {
 
         val result = offerSearchService.getOffersResult(strategy, 1L).get()
         assert(result.size == 1)
-        assert(result[0].offerSearch.id == 1L)
+        assert(result[0].offerSearch.id >= 1L)
         assert(result[0].offerSearch.state == OfferResultAction.NONE)
         assert(result[0].offer.id == 1L)
         assert(result[0].offer.owner == businessPublicKey)
@@ -193,6 +193,20 @@ class OfferSearchServiceTest {
         assert(result[0].offer.owner == businessPublicKey)
     }
 
+    @Test fun `all search items state with same searchRequestId and offerId should be REJECT`() {
+        `should be create new offer search item and get result by clientId and search request id`()
+        `should be create new offer search item and get result by clientId and search request id`()
+
+        offerSearchService.complain(1L, strategy).get()
+
+        val result = offerSearchService.getSearchOffers(strategy, 1L, 1L).get()
+        assert(result.size == 2)
+        assert(result[0].id >= 1L)
+        assert(result[0].state == OfferResultAction.REJECT)
+        assert(result[1].id >= 1L)
+        assert(result[1].state == OfferResultAction.REJECT)
+    }
+
     @Test fun `search item state should be ACCEPT`() {
         `should be create new offer search item and get result by clientId and search request id`()
 
@@ -211,6 +225,27 @@ class OfferSearchServiceTest {
         assert(result[0].offerSearch.state == OfferResultAction.ACCEPT)
         assert(result[0].offer.id == 1L)
         assert(result[0].offer.owner == businessPublicKey)
+    }
+
+    @Test fun `all search items state with same searchRequestId and offerId should be ACCEPT`() {
+        `should be create new offer search item and get result by clientId and search request id`()
+        `should be create new offer search item and get result by clientId and search request id`()
+
+        val projectId = offerPrices[0].id
+        val offerShareData = OfferShareData(1L, businessPublicKey, publicKey, "response", BigDecimal.ZERO.toString(), true, projectId)
+
+        offerShareService.grantAccess(
+                publicKey,
+                offerShareData,
+                strategy
+        ).get()
+
+        val result = offerSearchService.getSearchOffers(strategy, 1L, 1L).get()
+        assert(result.size == 2)
+        assert(result[0].id >= 1L)
+        assert(result[0].state == OfferResultAction.ACCEPT)
+        assert(result[1].id >= 1L)
+        assert(result[1].state == OfferResultAction.ACCEPT)
     }
 
 }

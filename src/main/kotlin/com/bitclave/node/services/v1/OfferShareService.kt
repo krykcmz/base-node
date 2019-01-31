@@ -89,11 +89,20 @@ class OfferShareService(
                     .changeStrategy(strategy)
                     .saveShareData(shareData)
 
-            offerSearch.state = OfferResultAction.ACCEPT
+//            offerSearch.state = OfferResultAction.ACCEPT
+
+//            offerSearchRepository
+//                    .changeStrategy(strategy)
+//                    .saveSearchResult(offerSearch)
+
+            val relatedOfferSearches = offerSearchRepository.changeStrategy(strategy)
+                    .findBySearchRequestIdAndOfferId(offerSearch.searchRequestId, offerSearch.offerId)
+
+            relatedOfferSearches.forEach{offerSearchObj -> offerSearchObj.state = OfferResultAction.ACCEPT}
 
             offerSearchRepository
                     .changeStrategy(strategy)
-                    .saveSearchResult(offerSearch)
+                    .saveSearchResult(relatedOfferSearches)
         }
     }
 
